@@ -1,0 +1,38 @@
+import sys
+sys.setrecursionlimit(10000)
+
+def fib_recursive(n):
+    if n <= 1:
+        return n
+    return fib_recursive(n-1) + fib_recursive(n-2)
+
+def fib_iterative(n):
+    a, b = 0, 1
+    for _ in range(n):
+        a, b = b, a + b
+    return a
+
+from functools import lru_cache
+@lru_cache(maxsize=None)
+def fib_memo(n):
+    if n <= 1:
+        return n
+    return fib_memo(n-1) + fib_memo(n-2)
+
+def main():
+    n = 20
+    if len(sys.argv) > 1:
+        try:
+            n = int(sys.argv[1])
+        except:
+            pass
+    print(f"fib_iterative({n}) = {fib_iterative(n)}")
+    print(f"fib_memo({n}) = {fib_memo(n)}")
+
+    if n <= 30:
+        print(f"fib_recursive({n}) = {fib_recursive(n)}")
+    else:
+        print("Skipping naive recursive for large n")
+
+if __name__ == "__main__":
+    main()
