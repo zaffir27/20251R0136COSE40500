@@ -1,0 +1,58 @@
+import cv2
+import sys
+import os
+
+def detect_in_image(image_path, cascade_path):
+    img = cv2.imread(image_path)
+    if img is None:
+        print(f"Cannot load image: {image_path}")
+        return
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30,30))
+    for (x, y, w, h) in faces:
+        cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
+    print(f"Detected {len(faces)} face(s)")
+    cv2.imshow("Faces", img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+def detect_in_webcam(cascade_path):
+    cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        print("Cannot open webcam")
+        return
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30,30))
+        for (x, y, w, h) in faces:
+            cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
+        cv2.imshow("Webcam Face Detection (press 'q' to quit)", frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    cap.release()
+    cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    cascade_path = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+    if not os.path.exists(cascade_path):
+        print(f"Haar cascade not found at {cascade_path}. Please provide correct path.")
+        sys.exit(1)
+    face_cascade = cv2.CascadeClassifier(cascade_path)
+
+    if len(sys.argv) >= 2:
+        mode = sys.argv[1]
+        if mode == "image" and len(sys.argv) == 3:
+            detect_in_image(sys.argv[2], cascade_path)
+        elif mode == "webcam":
+            detect_in_webcam(cascade_path)
+        else:
+            print("Usage:")
+            print("  python face_detection.py image <image_path>")
+            print("  python face_detection.py webcam")
+    else:
+        print("Usage:")
+        print("  python face_detection.py image <image_path>")
+        print("  python face_detection.py webcam")
