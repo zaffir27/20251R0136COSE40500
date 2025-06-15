@@ -1,0 +1,43 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.widgets import Slider, Button
+
+def main():
+    amp0 = 1.0
+    freq0 = 1.0
+
+    x = np.linspace(0, 2 * np.pi, 400)
+    y = amp0 * np.sin(freq0 * x)
+
+    fig, ax = plt.subplots()
+    plt.subplots_adjust(left=0.1, bottom=0.3)
+    line, = ax.plot(x, y, lw=2)
+    ax.set_title("Interactive Sine Wave")
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+
+    ax_amp = plt.axes([0.1, 0.2, 0.8, 0.03])
+    ax_freq = plt.axes([0.1, 0.15, 0.8, 0.03])
+    slider_amp = Slider(ax_amp, "Amplitude", 0.1, 5.0, valinit=amp0)
+    slider_freq = Slider(ax_freq, "Frequency", 0.1, 5.0, valinit=freq0)
+
+    def update(val):
+        amp = slider_amp.val
+        freq = slider_freq.val
+        line.set_ydata(amp * np.sin(freq * x))
+        fig.canvas.draw_idle()
+
+    slider_amp.on_changed(update)
+    slider_freq.on_changed(update)
+
+    ax_reset = plt.axes([0.8, 0.025, 0.1, 0.04])
+    button = Button(ax_reset, "Reset", hovercolor='0.975')
+    def reset(event):
+        slider_amp.reset()
+        slider_freq.reset()
+    button.on_clicked(reset)
+
+    plt.show()
+
+if __name__ == "__main__":
+    main()
